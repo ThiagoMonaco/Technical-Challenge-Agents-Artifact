@@ -3,9 +3,10 @@
 Agente Python que atende em português no terminal, consulta catálogo e pedidos em SQLite e
 responde com base no manual fornecido. Usa a Responses API da OpenAI com ferramentas de leitura.
 
-**Estado da entrega:** implementação local e testes automatizados disponíveis. A avaliação com API
-e as cinco transcrições reais dependem de `OPENAI_API_KEY`; consulte [VALIDATION.md](VALIDATION.md)
-para distinguir o que foi executado do que ainda está pendente. Saídas de mocks não são exemplos reais.
+**Estado da entrega local:** 65 testes automatizados passaram; os 16 cenários reais foram revisados
+e corrigidos com regressões; cinco conversas reais estão em [examples/](examples/).
+Consulte [VALIDATION.md](VALIDATION.md) e a [matriz de avaliação](evaluation/REVIEW.md) para evidências,
+falhas iniciais e limitações observadas. Tudo permanece local por escolha do usuário; não houve publicação.
 
 ## Instalação e execução
 
@@ -22,8 +23,10 @@ emporio setup
 cp .env.example .env
 ```
 
-Edite `.env` localmente e preencha `OPENAI_API_KEY`. A API é paga; a ausência da chave não impede
-setup ou testes. Não publique `.env`. Configuração:
+Defina `OPENAI_API_KEY` no ambiente do terminal ou edite `.env` localmente. Se você já exporta a
+variável na configuração do shell, `.env` é opcional; execute o chat nesse terminal para herdar a
+variável. O ambiente de outro aplicativo pode não herdar exportações de um shell interativo.
+A API é paga; a ausência da chave não impede setup ou testes. Não publique `.env`. Configuração:
 
 | Variável | Padrão | Uso |
 |---|---|---|
@@ -189,8 +192,10 @@ e 2 para configuração inválida. Código 0 não significa aprovação semânti
 
 Snapshot estático, autenticação simulada, busca lexical e identificação manual de conflitos. Regras de
 consulta obrigatória e tom são instruções ao modelo, não uma prova de que nunca haverá alucinação.
-O manual pode conter ambiguidades adicionais. Sem API configurada não há comprovação da qualidade
-das respostas reais. Histórico longo aumenta custo e pode atingir limites; `/reset` inicia nova conversa.
+O manual pode conter ambiguidades adicionais. Os 16 cenários reais não comprovam qualidade para
+todos os diálogos: a avaliação encontrou falhas e exigiu ajustes nas instruções. Ainda há respostas
+longas, termos técnicos e dicas genéricas de acessórios além do necessário. Histórico longo aumenta
+custo e pode atingir limites; `/reset` inicia nova conversa.
 
 Não efetua compras, reservas, cancelamentos, estornos, reclamações nem encaminhamentos reais.
 Sem WhatsApp, consulta à transportadora, preço de frete, calendário de feriados ou banco vetorial.
