@@ -74,9 +74,10 @@ def prepare(source, output):
         for path in (output / "data").glob("* - customers.csv"):
             anonymize(path)
         (output / "PUBLICATION.md").write_text(NOTICE, encoding="utf-8")
-        metadata = git(source, "show", "-s", "--format=%an%x00%ae%x00%aI%x00%cI%x00%B", commit).decode()
-        author, email, author_date, commit_date, message = metadata.split("\0", 4)
+        metadata = git(source, "show", "-s", "--format=%an%x00%ae%x00%cn%x00%ce%x00%aI%x00%cI%x00%B", commit).decode()
+        author, email, committer, committer_email, author_date, commit_date, message = metadata.split("\0", 6)
         env = {**os.environ, "GIT_AUTHOR_NAME": author, "GIT_AUTHOR_EMAIL": email,
+               "GIT_COMMITTER_NAME": committer, "GIT_COMMITTER_EMAIL": committer_email,
                "GIT_AUTHOR_DATE": author_date, "GIT_COMMITTER_DATE": commit_date}
         git(output, "add", "--all")
         subprocess.run(["git", "-C", str(output), "commit", "--allow-empty", "-F", "-"],
