@@ -58,7 +58,7 @@ def prepare(source, output):
     output.mkdir(parents=True)
     subprocess.run(["git", "init", "-b", "main", str(output)], check=True, stdout=subprocess.DEVNULL)
     for commit in commits:
-        names = git(source, "ls-tree", "-r", "--name-only", commit).decode().splitlines()
+        names = git(source, "ls-tree", "-rz", "--name-only", commit).decode().split("\0")
         if any(Path(name).name.startswith(".env") and Path(name).name != ".env.example" for name in names):
             raise ValueError("Histórico contém arquivo de ambiente privado; publicação interrompida.")
         for item in output.iterdir():
