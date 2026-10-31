@@ -63,6 +63,18 @@ def test_duplicate_and_missing_columns(tmp_path):
         read_sources(tmp_path / "data")
 
 
+def test_failed_setup_preserves_existing_database(tmp_path):
+    source = tmp_path / "data"
+    output = tmp_path / "output"
+    shutil.copytree(ROOT / "data", source)
+    build(source, output)
+    before = (output / "store.sqlite3").read_bytes()
+    next(source.glob("* - products.csv")).write_text("invalid\n")
+    with pytest.raises(DataError):
+        build(source, output)
+    assert (output / "store.sqlite3").read_bytes() == before
+
+
 def test_search_filters_and_accents(store):
     result = store.search_products(category="violoes", max_price=1000, limit=10)
     assert result["products"] and len(result["products"]) == 10

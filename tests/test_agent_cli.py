@@ -4,7 +4,9 @@ import logging
 from types import SimpleNamespace
 
 from openai import APIError
+from openai import OpenAI
 from openai.types.responses import Response
+import httpx2
 import pytest
 
 from emporio.agent import API_FAILURE, ROUND_LIMIT, Agent
@@ -65,6 +67,25 @@ def test_real_sdk_response_types_and_reasoning_preserved(store):
     assert requests[0]["store"] is False and requests[0]["tools"] == TOOLS
     assert requests[0]["parallel_tool_calls"] is False
     assert requests[0]["input"][0]["role"] == "developer"
+
+
+def test_sdk_serializes_full_tool_round_trip_without_network(store):
+    captured = []
+    outputs = iter([response([call()]), final("Yamaha C40 consultado no snapshot.")])
+
+    def handle(request):
+        captured.append(json.loads(request.content))
+        return httpx2.Response(200, json=next(outputs).model_dump(mode="json"))
+
+    with httpx2.Client(transport=httpx2.MockTransport(handle)) as http:
+        client = OpenAI(api_key="unit-test-placeholder", http_client=http, max_retries=0)
+        bot = Agent(client, store, "Manual de teste")
+        assert bot.reply("Consulte produto 81") == "Yamaha C40 consultado no snapshot."
+    assert len(captured) == 2
+    assert captured[0]["tools"][0]["strict"] is True
+    result = next(item for item in captured[1]["input"] if item.get("type") == "function_call_output")
+    assert json.loads(result["output"])["product_id"] == 81
+    assert captured[1]["store"] is False
 
 
 def test_follow_up_and_reset(store):
