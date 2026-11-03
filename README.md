@@ -48,6 +48,64 @@ Sem `--customer-id`, o agente explica como iniciar uma sessão de demonstração
 **Identidade simulada:** qualquer operador do terminal pode escolher um ID. Isso demonstra isolamento
 na ferramenta, não autenticação de produção. O modelo não pode selecionar ou alterar esse ID.
 
+## Execução com Docker
+
+Requer Docker em execução e Docker Compose v2. Não precisa instalar Python no host.
+Na raiz do projeto, com `OPENAI_API_KEY` já exportada no terminal (ou definida no `.env` local):
+
+```sh
+mkdir -p runtime evaluation/runs examples
+docker compose build
+docker compose run --rm app chat --customer-id 3
+```
+
+O entrypoint prepara SQLite e manual automaticamente se ainda não existirem. Para reconstruir após
+alterar os dados, reconstrua a imagem e execute setup explicitamente:
+
+```sh
+docker compose build
+docker compose run --rm app setup
+```
+
+Setup não usa a API e funciona sem chave. Comandos de chat: `/help`, `/reset` e `/exit`.
+Para rodar os cenários pagos e salvar cinco conversas reais, usando uma pasta de execução nova:
+
+```sh
+docker compose run --rm app evaluate --output /app/evaluation/runs/docker-01 --record-examples
+```
+
+`runtime/`, `evaluation/runs/` e `examples/` são montados do checkout e persistem após `--rm`.
+A avaliação pode substituir os cinco exemplos; novas respostas precisam de revisão semântica.
+Evite executar setup e chat simultaneamente sobre a mesma base.
+
+A imagem roda com usuário não-root (UID/GID 1000). No Linux, se seu usuário tiver outro UID/GID,
+defina os valores antes dos comandos Compose para que os arquivos montados sejam graváveis:
+
+```sh
+export EMPORIO_UID="$(id -u)"
+export EMPORIO_GID="$(id -g)"
+```
+
+`.env`, Git, ambientes locais, logs e artefatos gerados ficam fora do contexto de build.
+A chave é recebida apenas no ambiente do container em execução; não é gravada na imagem.
+Compose lê as variáveis do shell e do `.env`; não é necessário copiar a chave para `.env` se já está
+exportada no terminal. Não publique a imagem, pois ela contém os dados fornecidos para o desafio.
+
+Também é possível usar Docker diretamente (dados preparados dentro do container, sem persistência):
+
+```sh
+docker build -t emporio-agent:local .
+docker run --rm -it -e OPENAI_API_KEY emporio-agent:local chat --customer-id 3
+# Alternativa quando a chave está apenas no arquivo local:
+docker run --rm -it --env-file .env emporio-agent:local chat --customer-id 3
+```
+
+Para executar a suíte offline dentro da imagem Linux, sem chave e sem chamadas pagas:
+
+```sh
+docker build --target test -t emporio-agent:test .
+```
+
 ## Arquitetura e decisões
 
 ```text

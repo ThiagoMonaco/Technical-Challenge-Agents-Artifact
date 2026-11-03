@@ -1,0 +1,19 @@
+services:
+  app:
+    build:
+      context: .
+      target: runtime
+    image: emporio-agent:local
+    # Override on Linux if the checkout belongs to a UID/GID other than 1000.
+    user: "${EMPORIO_UID:-1000}:${EMPORIO_GID:-1000}"
+    stdin_open: true
+    tty: true
+    environment:
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+      OPENAI_MODEL: "${OPENAI_MODEL:-gpt-5-mini}"
+      OPENAI_TIMEOUT_SECONDS: "${OPENAI_TIMEOUT_SECONDS:-45}"
+      EMPORIO_DEBUG: "${EMPORIO_DEBUG:-0}"
+    volumes:
+      - ./runtime:/app/runtime
+      - ./evaluation/runs:/app/evaluation/runs
+      - ./examples:/app/examples

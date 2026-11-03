@@ -30,6 +30,19 @@
 - Arquivos completos de execução, incluindo tokens, ferramentas e respostas, em `evaluation/runs/`
   (ignorados pelo Git). PASS automático não substitui revisão semântica e esta revisão não é humana independente.
 
+## Docker — 03/11/2026
+
+- Dockerfile com imagem Python 3.14, execução não-root e targets `runtime` e `test`.
+- `docker compose config --quiet`: configuração válida com Compose v2.19.1.
+- Build Linux ARM64 no Colima (Engine 24.0.7), Python 3.14.10: **65 testes passaram** dentro da imagem.
+- Imagens locais `emporio-agent:local` e `emporio-agent:test` construídas sem publicação.
+- Container novo: preparou as seis tabelas e o manual automaticamente e executou `/help`, `/reset`
+  e `/exit` com chave fictícia, sem chamadas à API.
+- Compose: leitura da base existente e escrita temporária em runtime, resultados e exemplos aprovadas.
+- UID 1000 confirmado; `.env` e `.git` ausentes da imagem. Nenhuma credencial foi usada no build.
+- O primeiro build demorou na resolução da imagem pública; o retry usou configuração Docker
+  temporária sem credential helper. A configuração Docker do usuário não foi alterada.
+
 ## Publicação
 
 - Repositório público: **não criado e não será publicado nesta execução**, conforme pedido explícito
@@ -43,4 +56,6 @@ A segunda tentativa, da cópia anonimizada, também foi rejeitada pela revisão 
 preserva IDs de clientes vinculados ao histórico de pedidos. O usuário optou por manter tudo local;
 nenhuma nova tentativa de publicação será realizada.
 
-Nenhum repositório foi criado ou enviado para GitHub. A avaliação não estabelece garantia para novos diálogos.
+Posteriormente, a pedido do usuário, foi criado o repositório **privado e vazio**
+`ThiagoMonaco/Technical-Challenge-Agents-Artifact`, configurado como origin. Nenhum código, commit
+ou imagem foi enviado. A avaliação não estabelece garantia para novos diálogos.
