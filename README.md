@@ -223,8 +223,3 @@ de pessoas a partir dos arquivos fornecidos. A cópia gerada contém `PUBLICATIO
 ```sh
 python scripts/prepare_public.py --output runtime/publication
 ```
-
-Use uma pasta nova para cada geração. A cópia só inclui arquivos já commitados; não contém `.env`,
-runtime ou logs. **Envie para GitHub somente a cópia anonimizada**, nunca o Git do checkout original.
-Para mudanças posteriores, gere uma nova cópia a partir do histórico local e confira os resultados
-antes de atualizar o remoto. O script não publica nem faz force-push.
